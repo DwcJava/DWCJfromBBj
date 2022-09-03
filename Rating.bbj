@@ -1,0 +1,59 @@
+use org.dwcj.shoelacecontrols.Rating
+use org.dwcj.controls.Button
+use org.dwcj.bridge.BBjPanelAdapter
+use org.dwcj.Environment
+use java.util.function.Consumer
+
+declare BBjAPI api!
+declare BBjSysGui sysgui!
+declare BBjTopLevelWindow wnd!
+declare BBjStaticText st!
+declare BBjButton button!
+declare Rating rating!
+
+api! = BBjAPI()
+sysgui! = api!.openSysGui("X0")
+
+wnd! = sysgui!.addWindow("Shoelace Rating", $01111083$)
+wnd!.setStyle("padding","30px")
+wnd!.setStyle("margin-left","40vw")
+wnd!.setPanelStyle("display","inline-grid")
+
+st! = wnd!.addStaticText("Rating: ")
+
+rem instantiate DWCJ environment
+h! = new ::DWCJ/DwcjHelper.bbj::DwcjHelper() 
+Environment.init(BBjAPI(), h!)
+
+rem use BBjPanelAdapter to access window with DWCJ
+pa! = new BBjPanelAdapter(wnd!)
+
+rating! = new Rating()
+pa!.add(rating!)
+
+rating!.onValueChanged(new RatingConsumer())
+
+btn! = new Button("TEST")
+pa!.add(btn!)
+
+btn!.onClick(new ButtonPushConsumer())
+
+process_events
+
+class public ButtonPushConsumer implements Consumer
+    method public void accept(Object ev!)
+        a=msgbox("Hello There!")
+    methodend
+classend
+
+class public RatingConsumer implements Consumer
+    method public void accept(Object ev!)
+        rating_event! = CAST(org.dwcj.events.RatingValueChangedEvent,ev!)
+        a=msgbox("Hello There Rating! "+str(rating_event!.getValue()))
+    methodend
+classend
+
+    
+    
+
+    
